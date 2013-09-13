@@ -1,0 +1,4 @@
+dcmenvgen
+=========
+
+DICOM environment generator
