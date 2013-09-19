@@ -33,8 +33,15 @@ class Series:
 
     """
 
-    def generate_images(self):
-        print 'images'
+    def generate_images(self, num_images):
+        self.images = []
+        for i in xrange(random.randint(num_images[0], num_images[1])):
+            image = Image()
+
+            image.sop_class_uid = 'FILL'
+            image.sop_instance_uid = dicom.UID.generate_uid()
+
+            self.images.append(image)
 
 
 class Study:
@@ -56,15 +63,15 @@ class Study:
     def generate_series(self, num_series, study_date):
         self.series = []
         for i in xrange(random.randint(num_series[0], num_series[1])):
-            s = Series()
+            series = Series()
 
-            s.series_date = study_date
-            s.series_time = datetime.datetime.now().time()
+            series.series_date = study_date
+            series.series_time = datetime.datetime.now().time()
 
-            s.series_instance_uid = dicom.UID.generate_uid()
-            s.modality = 'XX'
+            series.series_instance_uid = dicom.UID.generate_uid()
+            series.modality = 'XX'
 
-            self.series.append(s)
+            self.series.append(series)
 
 
 class Patient:
@@ -92,42 +99,42 @@ class Patient:
         self.studies = []
         last_used_date = patient_birth_date
         for i in xrange(random.randint(num_studies[0], num_studies[1])):
-            s = Study()
+            study = Study()
 
             study_datetime = utils.random_date_between(last_used_date,
                                                        datetime.datetime.now())
-            s.study_date = study_datetime.date()
-            s.study_time = study_datetime.time()
+            study.study_date = study_datetime.date()
+            study.study_time = study_datetime.time()
             last_used_date = study_datetime
 
-            s.accession_number = utils.random_string([8, 16], False)
-            s.study_description = 'FILL'
-            s.study_instance_uid = dicom.UID.generate_uid()
-            self.studies.append(s)
+            study.accession_number = utils.random_string([8, 16], False)
+            study.study_description = 'FILL'
+            study.study_instance_uid = dicom.UID.generate_uid()
+            self.studies.append(study)
 
 
 def generate_patients(num_patients, id_length, extra_chars):
     patients = []
     for i in xrange(num_patients):
-        p = Patient()
+        patient = Patient()
 
         sex = random.randint(0, 1)
         if sex == 0:
-            p.first_name = names.get_first_name('female')
-            p.sex = 'F'
+            patient.first_name = names.get_first_name('female')
+            patient.sex = 'F'
         else:
-            p.first_name = names.get_full_name('male')
-            p.sex = 'M'
+            patient.first_name = names.get_full_name('male')
+            patient.sex = 'M'
 
-        p.last_name = names.get_last_name()
+        patient.last_name = names.get_last_name()
 
         # generate patient id
-        p.id = utils.random_string(id_length, extra_chars)
+        patient.id = utils.random_string(id_length, extra_chars)
 
         # generate patient birthday
         start = datetime.datetime(1900, 1, 1)
         end = datetime.datetime.now()
-        p.birth_date = utils.random_date_between(start, end)
+        patient.birth_date = utils.random_date_between(start, end)
 
-        patients.append(p)
+        patients.append(patient)
     return patients
