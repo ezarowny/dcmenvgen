@@ -24,6 +24,8 @@ class Series:
 
     Instance Variables:
     modality            -- the modality of the series
+    series_date         -- the date the series was performed
+    series_time         -- the time the series was performed
     series_instance_uid -- uniquely identifies the series
     images              -- the series' images
 
@@ -51,8 +53,18 @@ class Study:
 
     """
 
-    def generate_series(self):
-        print 'series'
+    def generate_series(self, num_series, study_date):
+        self.series = []
+        for i in xrange(random.randint(num_series[0], num_series[1])):
+            s = Series()
+
+            s.series_date = study_date
+            s.series_time = datetime.datetime.now().time()
+
+            s.series_instance_uid = dicom.UID.generate_uid()
+            s.modality = 'XX'
+
+            self.series.append(s)
 
 
 class Patient:
@@ -80,18 +92,18 @@ class Patient:
         self.studies = []
         last_used_date = patient_birth_date
         for i in xrange(random.randint(num_studies[0], num_studies[1])):
-            study = Study()
+            s = Study()
 
             study_datetime = utils.random_date_between(last_used_date,
                                                        datetime.datetime.now())
-            study.study_date = study_datetime.date()
-            study.study_time = study_datetime.time()
+            s.study_date = study_datetime.date()
+            s.study_time = study_datetime.time()
             last_used_date = study_datetime
 
-            study.accession_number = utils.random_string([8, 16], False)
-            study.study_description = 'FILL'
-            study.study_instance_uid = dicom.UID.generate_uid()
-            self.studies.append(study)
+            s.accession_number = utils.random_string([8, 16], False)
+            s.study_description = 'FILL'
+            s.study_instance_uid = dicom.UID.generate_uid()
+            self.studies.append(s)
 
 
 def generate_patients(num_patients, id_length, extra_chars):
