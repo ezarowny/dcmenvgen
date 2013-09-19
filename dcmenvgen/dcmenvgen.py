@@ -25,12 +25,12 @@ def get_args():
 def generate_history(args):
     patients = hierarchy.generate_patients(args.num_patients, args.id_length,
                                            args.extra_pid_chars)
-    # for patient in patients:
-    #     patient.studies = patient.generate_studies()
+    for patient in patients:
+        patient.generate_studies(args.num_studies, patient.birth_date)
     #     for study in patient.studies:
-    #         study.series = study.generate_series()
+    #         study.generate_series()
     #         for series in study.series:
-    #             series.images = series.generate_images()
+    #             series.generate_images()
     return patients
 
 
@@ -41,6 +41,14 @@ def print_history(patients):
         print 'Sex: {0}'.format(p.sex)
         print 'Patient ID: {0}'.format(p.id)
         print 'Birth Date: {0}'.format(p.birth_date.date().isoformat())
+
+        for s in p.studies:
+            print '\t=== STUDY ==='
+            print '\tStudy UID: {0}'.format(s.study_instance_uid)
+            print '\tStudy Description: {0}'.format(s.study_description)
+            print '\tStudy Date: {0}'.format(s.study_date)
+            print '\tStudy Time: {0}'.format(s.study_time)
+            print '\tAccession Number: {0}'.format(s.accession_number)
     print '=' * 50
 
 

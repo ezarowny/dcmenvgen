@@ -1,4 +1,5 @@
 import datetime
+import dicom
 import names
 import random
 import utils
@@ -72,14 +73,25 @@ class Patient:
 
     """
 
-    def __init__(self):
-        print "hello init"
-
     def generate_alias(self):
         print "hello alias"
 
-    def generate_studies(self):
-        print 'studies'
+    def generate_studies(self, num_studies, patient_birth_date):
+        self.studies = []
+        last_used_date = patient_birth_date
+        for i in xrange(random.randint(num_studies[0], num_studies[1])):
+            study = Study()
+
+            study_datetime = utils.random_date_between(last_used_date,
+                                                       datetime.datetime.now())
+            study.study_date = study_datetime.date()
+            study.study_time = study_datetime.time()
+            last_used_date = study_datetime
+
+            study.accession_number = utils.random_string([8, 16], False)
+            study.study_description = 'FILL'
+            study.study_instance_uid = dicom.UID.generate_uid()
+            self.studies.append(study)
 
 
 def generate_patients(num_patients, id_length, extra_chars):
