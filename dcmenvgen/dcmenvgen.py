@@ -3,24 +3,28 @@ import hierarchy
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description='DICOM environment generator', prog='dcmenvgen')
+    parser = argparse.ArgumentParser(description='DICOM environment generator',
+                                     prog='dcmenvgen')
     parser.add_argument('--version', action='version', version='%(prog)s 0.1')
     parser.add_argument('num_patients', type=int, metavar='N',
                         help='number of patients to generate')
-    parser.add_argument('-ns', '--num_studies', type=int,
-                        metavar=('<min>', '<max>'), nargs=2, default=[5, 10],
-                        help='[range] number of studies to generate per patient (default: 5 10)')
     parser.add_argument('-il', '--id_length', type=int,
                         metavar=('<min>', '<max>'), nargs=2, default=[8, 16],
                         help='[range] length of patient id (default: 8 16)')
     parser.add_argument('-epc', '--extra_pid_chars', action='store_true',
-                        help='use space and underscore in patient ID generation')
+                        help='use space and underscore in patient ID' +
+                        'generation')
+    parser.add_argument('-ns', '--num_studies', type=int,
+                        metavar=('<min>', '<max>'), nargs=2, default=[5, 10],
+                        help='[range] number of studies to generate per' +
+                        'patient (default: 5 10)')
     args = parser.parse_args()
     return args
 
 
 def generate_history(args):
-    patients = hierarchy.generate_patients(args.num_patients)
+    patients = hierarchy.generate_patients(args.num_patients, args.id_length,
+                                           args.extra_pid_chars)
     # for patient in patients:
     #     patient.studies = patient.generate_studies()
     #     for study in patient.studies:

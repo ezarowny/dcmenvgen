@@ -82,7 +82,7 @@ class Patient:
         print 'studies'
 
 
-def generate_patients(num_patients):
+def generate_patients(num_patients, id_length, extra_chars):
     patients = []
     for i in xrange(num_patients):
         p = Patient()
@@ -98,10 +98,9 @@ def generate_patients(num_patients):
         p.last_name = names.get_last_name()
 
         # generate patient id
-        p.id = utils.random_string()
+        p.id = utils.random_string(id_length, extra_chars)
 
         # generate patient birthday
-        # TODO - make this configurable
         start = datetime.datetime(1900, 1, 1)
         end = datetime.datetime.now()
         p.birth_date = utils.random_date_between(start, end)
