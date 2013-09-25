@@ -1,3 +1,4 @@
+import config
 import datetime
 import dicom
 import names
@@ -10,12 +11,16 @@ class Image:
     """ Description
 
     Instance Variables:
-    sop_class_uid       --
+    sop_class_uid       -- sop class uid of the image
     sop_instance_uid    -- uniquely identifies the image
 
     Public Methods:
 
     """
+
+    def __init__(self, sop_class_uid):
+        self.sop_class_uid = sop_class_uid
+        self.sop_instance_uid = dicom.UID.generate_uid()
 
 
 class Series:
@@ -24,24 +29,29 @@ class Series:
 
     Instance Variables:
     modality            -- the modality of the series
-    series_date         -- the date the series was performed
-    series_time         -- the time the series was performed
+    series_datetime     -- the date and time the series was performed
     series_instance_uid -- uniquely identifies the series
     images              -- the series' images
 
     Public Methods:
+    generate_images     -- generates images for the series
 
     """
 
-    def generate_images(self, num_images):
-        self.images = []
-        for i in xrange(random.randint(num_images[0], num_images[1])):
-            image = Image()
+    def __init__(self, from_date, modality):
+        self.modality = modality
+        self.series_datetime = datetime.datetime.combine(
+            from_date, datetime.datetime.now().time())
+        self.series_instance_uid = dicom.UID.generate_uid()
+        num_images = random.randint(config.min_images, config.max_images)
+        sop_class_uid = config.sampled_data.random_sop_class_uid(modality)
+        self.images = self.generate_images(num_images, sop_class_uid)
 
-            image.sop_class_uid = 'FILL'
-            image.sop_instance_uid = dicom.UID.generate_uid()
-
-            self.images.append(image)
+    def generate_images(self, num_images, sop_class_uid):
+        images = []
+        for i in xrange(num_images):
+            images.append(Image(sop_class_uid))
+        return images
 
 
 class Study:
@@ -49,92 +59,90 @@ class Study:
     """ Description
 
     Instance Variables:
-    study_date          -- the date the study was performed
-    study_time          -- the time the study was performed
+    study_datetime      -- the date and time the study was performed
     accession_number    -- the accession number for the study
     study_description   -- the description of the study
     study_instance_uid  -- uniquely identifies the study
     series              -- the study's series
 
     Public Methods:
+    generate_series     -- generates series for the study
 
     """
 
-    def generate_series(self, num_series, study_date):
-        self.series = []
-        for i in xrange(random.randint(num_series[0], num_series[1])):
-            series = Series()
+    def __init__(self, from_date):
+        self.study_datetime = utils.random_date_between(
+            from_date, datetime.datetime.now())
+        accession_length = random.randint(
+            config.min_accn_length, config.max_accn_length)
+        self.accession_number = utils.random_string(accession_length)
+        modality = config.sampled_data.random_modality()
+        self.study_description = config.sampled_data.random_study_description(
+            modality)
+        self.study_instance_uid = dicom.UID.generate_uid()
+        num_series = random.randint(config.min_series, config.max_series)
+        self.series = self.generate_series(
+            num_series, self.study_datetime.date(), modality)
 
-            series.series_date = study_date
-            series.series_time = datetime.datetime.now().time()
-
-            series.series_instance_uid = dicom.UID.generate_uid()
-            series.modality = 'XX'
-
-            self.series.append(series)
+    def generate_series(self, num_series, study_date, modality):
+        series = []
+        for i in xrange(num_series):
+            series.append(Series(study_date, modality))
+        return series
 
 
 class Patient:
 
-    """ Description
+    """Represents a DICOM patient.
 
     Instance Variables:
     id          -- the patient's id
+    sex         -- the patient's sex
     first_name  -- the patient's first name
     last_name   -- the patient's last name
-    gender      -- the patient's gender
     birth_date  -- the patient's birth date
     aliases     -- the patient's information permutations
     studies     -- the patient's studies
 
     Public Methods:
-    generate_alias  -- makes a permutation of the patient's information
+    generate_alias      -- makes a permutation of the patient's information
+    generate_studies    -- generates studies for the patient
 
     """
 
-    def generate_alias(self):
-        print "hello alias"
+    def __init__(self):
+        id_length = random.randint(config.min_id_length, config.max_id_length)
+        self.id = utils.random_string(id_length)
+        self.sex = random.choice('MF')
 
-    def generate_studies(self, num_studies, patient_birth_date):
-        self.studies = []
-        last_used_date = patient_birth_date
-        for i in xrange(random.randint(num_studies[0], num_studies[1])):
-            study = Study()
-
-            study_datetime = utils.random_date_between(last_used_date,
-                                                       datetime.datetime.now())
-            study.study_date = study_datetime.date()
-            study.study_time = study_datetime.time()
-            last_used_date = study_datetime
-
-            study.accession_number = utils.random_string([8, 16], False)
-            study.study_description = 'FILL'
-            study.study_instance_uid = dicom.UID.generate_uid()
-            self.studies.append(study)
-
-
-def generate_patients(num_patients, id_length, extra_chars):
-    patients = []
-    for i in xrange(num_patients):
-        patient = Patient()
-
-        sex = random.randint(0, 1)
-        if sex == 0:
-            patient.first_name = names.get_first_name('female')
-            patient.sex = 'F'
+        if self.sex == 'M':
+            self.first_name = names.get_first_name('male')
         else:
-            patient.first_name = names.get_full_name('male')
-            patient.sex = 'M'
+            self.first_name = names.get_first_name('female')
+        self.last_name = names.get_last_name()
 
-        patient.last_name = names.get_last_name()
-
-        # generate patient id
-        patient.id = utils.random_string(id_length, extra_chars)
-
-        # generate patient birthday
         start = datetime.datetime(1900, 1, 1)
         end = datetime.datetime.now()
-        patient.birth_date = utils.random_date_between(start, end)
+        self.birth_date = utils.random_date_between(start, end)
 
-        patients.append(patient)
+        self.studies = self.generate_studies(self.birth_date)
+
+    def generate_alias(self):
+        pass
+
+    def generate_studies(self, start_datetime):
+        studies = []
+        last_datetime = start_datetime
+        num_studies = random.randint(config.min_studies, config.max_studies)
+        for i in xrange(num_studies):
+            study = Study(last_datetime)
+            studies.append(study)
+            last_datetime = study.study_datetime
+        return studies
+
+
+def generate_patients(num_patients):
+    patients = []
+    for i in xrange(num_patients):
+        patients.append(Patient())
     return patients

@@ -3,11 +3,7 @@ import random
 import string
 
 
-def random_string(string_length, extra_chars):
-    chars = string.ascii_uppercase + string.digits + string.ascii_lowercase
-    if extra_chars:
-        chars += ' _'
-    size = random.randint(string_length[0], string_length[1])
+def random_string(size, chars=string.ascii_letters + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
 
 
