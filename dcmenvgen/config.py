@@ -27,3 +27,9 @@ max_series = 3
 # how many images to generate per series
 min_images = 3
 max_images = 20
+
+# whether or not to generate structured reports
+gen_sr = True
+
+# how often to generate structured reports
+gen_sr_chance = 0.25

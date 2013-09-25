@@ -88,6 +88,9 @@ class Study:
         series = []
         for i in xrange(num_series):
             series.append(Series(study_date, modality))
+        if config.gen_sr:
+            if random.random() < config.gen_sr_chance:
+                series.append(Series(study_date, 'SR'))
         return series
 
 
