@@ -2,14 +2,17 @@ import argparse
 import hierarchy
 
 
-def get_args():
-    parser = argparse.ArgumentParser(description='DICOM environment generator',
-                                     prog='dcmenvgen')
-    parser.add_argument('--version', action='version', version='%(prog)s 0.1')
-    parser.add_argument('num_patients', type=int, metavar='N',
-                        help='number of patients to generate')
-    args = parser.parse_args()
-    return args
+def generate(args):
+    patients = hierarchy.generate_patients(args.num_patients)
+    print_history(patients)
+
+
+def populate(args):
+    print 'populate'
+
+
+def deploy(args):
+    print 'deploy'
 
 
 def print_history(patients):
@@ -46,9 +49,29 @@ def print_history(patients):
 
 
 def main():
-    args = get_args()
-    patients = hierarchy.generate_patients(args.num_patients)
-    print_history(patients)
+    parser = argparse.ArgumentParser(description='DICOM environment generator',
+                                     prog='dcmenvgen')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.1')
+    subparsers = parser.add_subparsers(title='commands', metavar='<command>')
+
+    # create the parser for the "generate" command
+    parser_gen = subparsers.add_parser('generate', help='generate patients')
+    parser_gen.add_argument('num_patients', type=int,
+                            help='number of patients to generate')
+    parser_gen.set_defaults(func=generate)
+
+    # create the parser for the "populate" command
+    parser_gen = subparsers.add_parser('populate', help='populate dicom files')
+    parser_gen.set_defaults(func=populate)
+
+    # create the parser for the "deploy" command
+    parser_gen = subparsers.add_parser('deploy',
+                                       help='deploy workstations and archives')
+    parser_gen.set_defaults(func=deploy)
+
+    # call the function indicated by the selected subparser
+    args = parser.parse_args()
+    args.func(args)
 
 
 if __name__ == "__main__":
