@@ -52,5 +52,4 @@ def create_dicom_file(patient, study, series, image, image_path):
     ds.SOPClassUID = image.sop_class_uid
 
     # save file with dicom extension
-    print ds
     ds.save_as(image_path + '.dcm')

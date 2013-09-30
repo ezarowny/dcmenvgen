@@ -33,3 +33,32 @@ gen_sr = True
 
 # how often to generate structured reports
 gen_sr_chance = 0.25
+
+# workstations to deploy
+# 'AE Title': {
+#     'attribute': value
+# }
+workstations = {
+    'WK1': {
+        'port': 11112
+    },
+    'WK2': {
+        'port': 11113
+    },
+    'WK2': {
+        'port': 11114
+    }
+}
+
+# archives to deploy
+archives = {
+    'AR1': {
+        'port': 4006
+    },
+    'AR2': {
+        'port': 4007
+    },
+    'AR32': {
+        'port': 4008
+    }
+}
