@@ -1,9 +1,9 @@
 # Settings for dcmenvgen
 
-import sampleddata
+import sampledata
 
 # sampled modality, study description and SOP class UID
-sampled_data = sampleddata.SampledData()
+sample_data = sampledata.SampleData()
 
 # extra characters to include in patient id generation
 extra_pid_chars = ' _'
@@ -33,6 +33,10 @@ gen_sr = True
 
 # how often to generate structured reports
 gen_sr_chance = 0.25
+
+# Modalities for which sample data exists in the image directory
+enabled_modalities = ['CR', 'CT', 'DX', 'MG', 'MR',
+                      'NM', 'RG', 'US']
 
 # workstations to deploy
 # 'AE Title': {

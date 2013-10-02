@@ -12,14 +12,12 @@ class Image:
 
     Instance Variables:
     sop_class_uid       -- sop class uid of the image
-    sop_instance_uid    -- uniquely identifies the image
 
     Public Methods:
 
     """
 
-    def __init__(self, sop_class_uid):
-        self.sop_class_uid = sop_class_uid
+    def __init__(self):
         self.sop_instance_uid = dicom.UID.generate_uid()
 
 
@@ -44,13 +42,12 @@ class Series:
             from_date, datetime.datetime.now().time())
         self.series_instance_uid = dicom.UID.generate_uid()
         num_images = random.randint(config.min_images, config.max_images)
-        sop_class_uid = config.sampled_data.random_sop_class_uid(modality)
-        self.images = self.generate_images(num_images, sop_class_uid)
+        self.images = self.generate_images(num_images)
 
-    def generate_images(self, num_images, sop_class_uid):
+    def generate_images(self, num_images):
         images = []
         for i in xrange(num_images):
-            images.append(Image(sop_class_uid))
+            images.append(Image())
         return images
 
 
@@ -76,8 +73,8 @@ class Study:
         accession_length = random.randint(
             config.min_accn_length, config.max_accn_length)
         self.accession_number = utils.random_string(accession_length)
-        modality = config.sampled_data.random_modality()
-        self.study_description = config.sampled_data.random_study_description(
+        modality = config.sample_data.random_modality()
+        self.study_description = config.sample_data.random_study_description(
             modality)
         self.study_instance_uid = dicom.UID.generate_uid()
         num_series = random.randint(config.min_series, config.max_series)

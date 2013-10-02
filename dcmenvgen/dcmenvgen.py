@@ -88,8 +88,6 @@ def print_history(patients):
                 for image in series.images:
                     print '\t\t\t=== IMAGE ==='
                     print '\t\t\tImage UID: {0}'.format(image.sop_instance_uid)
-                    print '\t\t\tSOP Class UID: {0}'.format(
-                        image.sop_class_uid)
     print '=' * 50
 
 

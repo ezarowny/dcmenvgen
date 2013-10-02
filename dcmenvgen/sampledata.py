@@ -1,8 +1,9 @@
+import config
 import csv
 import random
 
 
-class SampledData:
+class SampleData:
 
     """Description
 
@@ -18,36 +19,20 @@ class SampledData:
     """
 
     def __init__(self):
-        self.study_data = {}
-        with open('studydata.txt') as data:
+        self.study_descriptions = {}
+        with open('sampledata/descriptions.csv') as data:
             reader = csv.reader(data)
             for row in reader:
                 modality = row[0]
                 study_description = row[1]
-                if modality not in self.study_data:
-                    self.study_data[modality] = []
-                self.study_data[modality].append(study_description)
+                if modality not in self.study_descriptions:
+                    self.study_descriptions[modality] = []
+                self.study_descriptions[modality].append(study_description)
 
-        self.sop_data = {}
-        with open('sopdata.txt') as data:
-            reader = csv.reader(data)
-            for row in reader:
-                modality = row[0]
-                sop_class_uid = row[1]
-                if modality not in self.sop_data:
-                    self.sop_data[modality] = []
-                self.sop_data[modality].append(sop_class_uid)
-
-    # Modality will come from study_data and not sop_data because sop_data
-    # contains all possible modalities and study_data may not.
     def random_modality(self):
-        modality = random.choice(self.study_data.keys())
+        modality = random.choice(config.enabled_modalities)
         return modality
 
     def random_study_description(self, modality):
-        study_description = random.choice(self.study_data[modality])
+        study_description = random.choice(self.study_descriptions[modality])
         return study_description
-
-    def random_sop_class_uid(self, modality):
-        sop_class_uid = random.choice(self.sop_data[modality])
-        return sop_class_uid

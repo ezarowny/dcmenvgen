@@ -1,6 +1,5 @@
 import datetime
 import dicom
-import os
 import random
 import string
 
@@ -15,18 +14,12 @@ def random_date_between(start, end):
 
 
 def create_dicom_file(patient, study, series, image, image_path):
-    original_path = os.path.join(os.path.dirname(dicom.__file__), 'testfiles/CT_small.dcm')
-    original = dicom.read_file(original_path)
+    original = dicom.read_file('images/{0}.dcm'.format(series.modality))
     ds = original
 
     # change meta header
-    # file_meta = dicom.dataset.Dataset()
-    ds.file_meta.MediaStorageSOPClassUID = image.sop_class_uid
     ds.file_meta.MediaStorageSOPInstanceUID = image.sop_instance_uid
     ds.file_meta.ImplementationClassUID = dicom.UID.pydicom_UIDs.keys()[0]
-
-    # create DICOM dataset
-    # ds = dicom.dataset.FileDataset(image_path, {}, file_meta=file_meta, preamble="\0" * 128)
 
     # add patient information
     ds.PatientID = patient.id
@@ -42,14 +35,12 @@ def create_dicom_file(patient, study, series, image, image_path):
     ds.StudyTime = study.study_datetime.time().strftime('%H%M%S')
 
     # add series information
-    ds.Modality = series.modality
     ds.SeriesInstanceUID = series.series_instance_uid
     ds.SeriesDate = series.series_datetime.date().strftime('%Y%m%d')
     ds.SeriesTime = series.series_datetime.time().strftime('%H%M%S')
 
     # add image information
     ds.SOPInstanceUID = image.sop_instance_uid
-    ds.SOPClassUID = image.sop_class_uid
 
     # save file with dicom extension
     ds.save_as(image_path + '.dcm')
