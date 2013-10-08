@@ -58,8 +58,9 @@ def populate(args):
 
 
 def deploy(args):
-    deployment.setup_directories(args.deploy_dir)
-    deployment.create_ae_config(args.deploy_dir)
+    if not deployment.check_directories(args.deploy_dir):
+        deployment.setup_directories(args.deploy_dir)
+        deployment.create_ae_config(args.deploy_dir)
     deployment.launch(args.deploy_dir)
 
 
@@ -128,7 +129,7 @@ def main():
     parser_dep = subparsers.add_parser('deploy',
                                        help='deploy workstations and archives')
     parser_dep.add_argument('dicom_dir', help='directory containing the dicom files to deploy')
-    parser_dep.add_argument('-o', '--deploy_dir', help='directory to deploy to')
+    parser_dep.add_argument('-o', '--deploy_dir', default='', help='directory to deploy to')
     parser_dep.add_argument('-d', '--dcmtk_dir', help='directory containing dcmtk binaries')
     parser_dep.set_defaults(func=deploy)
 

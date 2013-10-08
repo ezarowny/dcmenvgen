@@ -3,10 +3,19 @@ import os
 import subprocess
 
 
+def check_directories(deploy_dir):
+    config_file = os.path.join(deploy_dir, 'dcmqrscp.cfg')
+    if not os.path.isfile(config_file):
+        return False
+    for ae in config.archives['ae_titles'] + config.workstations['ae_titles']:
+        ae_dir = os.path.join(deploy_dir, ae)
+        if not os.path.isdir(ae_dir):
+            return False
+    return True
+
+
 def setup_directories(deploy_dir):
-    for ae in config.archives['ae_titles']:
-        os.makedirs(os.path.join(deploy_dir, ae))
-    for ae in config.workstations['ae_titles']:
+    for ae in config.archives['ae_titles'] + config.workstations['ae_titles']:
         os.makedirs(os.path.join(deploy_dir, ae))
 
 
@@ -24,10 +33,7 @@ def create_ae_config(deploy_dir):
         f.write('MaxAssociations = 16\n')
         f.write('\n')
         f.write('AETable BEGIN\n')
-        for ae in config.archives['ae_titles']:
-            ae_dir = '{}/{}'.format(deploy_dir, ae)
-            f.write('{}\t\t{}\t\tRW\t(500, 4096mb)\tANY\n'.format(ae, ae_dir))
-        for ae in config.workstations['ae_titles']:
+        for ae in config.archives['ae_titles'] + config.workstations['ae_titles']:
             ae_dir = '{}/{}'.format(deploy_dir, ae)
             f.write('{}\t\t{}\t\tRW\t(500, 4096mb)\tANY\n'.format(ae, ae_dir))
         f.write('AETable END\n')
@@ -35,4 +41,8 @@ def create_ae_config(deploy_dir):
 
 def launch(deploy_dir):
     config_file = os.path.join(deploy_dir, 'dcmqrscp.cfg')
-    subprocess.call(['dcmqrscp', '-c', '{}'.format(config_file)])
+    print 'Launching dcmqrscp...'
+    try:
+        subprocess.call(['dcmqrscp', '-c', '{}'.format(config_file)])
+    except KeyboardInterrupt:
+        print 'Quitting...'
