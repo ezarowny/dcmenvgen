@@ -43,9 +43,9 @@ def create_ae_config(deploy_dir):
 
 
 def distribute_images(dicom_dir, deploy_dir):
-    # For some reason subprocess and dcmqridx don't work well together.
-    # Passing an image directory with the format /dir/*/*/* doesn't work at all
-    # so we have to call dcmqridx with one image at a time.
+    # For some reason dcmqridx doesn't like subprocess passing in a path
+    # with *'s even thought it works on the command line just fine. Instead,
+    # we run the subprocess call for each image.
     for patient_dir in os.listdir(dicom_dir):
         patient_dir_path = os.path.join(dicom_dir, patient_dir)
         if os.path.isdir(patient_dir_path):
