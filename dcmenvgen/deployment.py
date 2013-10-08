@@ -1,5 +1,7 @@
 import config
+import glob
 import os
+import random
 import subprocess
 
 
@@ -38,6 +40,22 @@ def create_ae_config(deploy_dir):
             ae_dir = '{}/{}'.format(deploy_dir, ae)
             f.write('{}\t\t{}\t\tRW\t(500, 4096mb)\tANY\n'.format(ae, ae_dir))
         f.write('AETable END\n')
+
+
+def distribute_images(dicom_dir, deploy_dir):
+    # For some reason subprocess and dcmqridx don't work well together.
+    # Passing an image directory with the format /dir/*/*/* doesn't work at all
+    # so we have to call dcmqridx with one image at a time.
+    for patient_dir in os.listdir(dicom_dir):
+        patient_dir_path = os.path.join(dicom_dir, patient_dir)
+        if os.path.isdir(patient_dir_path):
+            for study_dir in os.listdir(patient_dir_path):
+                study_images = glob.glob(os.path.join(patient_dir_path,
+                                                      study_dir, '*', '*.dcm'))
+                archive = random.choice(config.archives['ae_titles'])
+                archive_dir = os.path.join(deploy_dir, archive)
+                for image in study_images:
+                    subprocess.call(['dcmqridx', archive_dir, image])
 
 
 def launch(deploy_dir):

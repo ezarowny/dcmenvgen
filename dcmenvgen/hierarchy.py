@@ -8,12 +8,10 @@ import utils
 
 class Image:
 
-    """ Description
+    """Represents a DICOM image.
 
     Instance Variables:
     sop_class_uid       -- sop class uid of the image
-
-    Public Methods:
 
     """
 
@@ -23,7 +21,7 @@ class Image:
 
 class Series:
 
-    """ Description
+    """Represents a DICOM series.
 
     Instance Variables:
     modality            -- the modality of the series
@@ -53,7 +51,7 @@ class Series:
 
 class Study:
 
-    """ Description
+    """Represents a DICOM study.
 
     Instance Variables:
     study_datetime      -- the date and time the study was performed

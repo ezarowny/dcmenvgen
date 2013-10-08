@@ -64,6 +64,7 @@ def deploy(args):
     if not deployment.check_directories(args.deploy_dir):
         deployment.setup_directories(args.deploy_dir)
         deployment.create_ae_config(args.deploy_dir)
+        deployment.distribute_images(args.dicom_dir, args.deploy_dir)
     deployment.launch(args.deploy_dir)
 
 

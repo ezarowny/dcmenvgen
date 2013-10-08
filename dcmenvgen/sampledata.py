@@ -5,11 +5,10 @@ import random
 
 class SampleData:
 
-    """Description
+    """Contains sampled field data of modality and study description pairings.
 
     Instance Variables:
     study_data  -- a dictionary containing study descriptions keyed by modality
-    sop_data    -- a dictionary containing SOP class UID's keyed by modality
 
     Public Methods:
     random_modality             -- get a random modality
