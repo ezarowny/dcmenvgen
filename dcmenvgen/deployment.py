@@ -33,7 +33,8 @@ def create_ae_config(deploy_dir):
         f.write('MaxAssociations = 16\n')
         f.write('\n')
         f.write('AETable BEGIN\n')
-        for ae in config.archives['ae_titles'] + config.workstations['ae_titles']:
+        for ae in (config.archives['ae_titles'] +
+                   config.workstations['ae_titles']):
             ae_dir = '{}/{}'.format(deploy_dir, ae)
             f.write('{}\t\t{}\t\tRW\t(500, 4096mb)\tANY\n'.format(ae, ae_dir))
         f.write('AETable END\n')
