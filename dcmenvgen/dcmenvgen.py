@@ -1,5 +1,6 @@
 import argparse
 import cPickle
+import deployment
 import hierarchy
 import os
 import shutil
@@ -23,7 +24,7 @@ def generate(args):
 def view(args):
     with open(args.patients_file, 'rb') as in_file:
         patients = cPickle.load(in_file)
-    print print_history(patients)
+    print_history(patients)
 
 
 def populate(args):
@@ -57,7 +58,9 @@ def populate(args):
 
 
 def deploy(args):
-    print 'deploy'
+    deployment.setup_directories(args.deploy_dir)
+    deployment.create_ae_config(args.deploy_dir)
+    deployment.launch(args.deploy_dir)
 
 
 def print_history(patients):
@@ -124,6 +127,9 @@ def main():
     # create the parser for the "deploy" command
     parser_dep = subparsers.add_parser('deploy',
                                        help='deploy workstations and archives')
+    parser_dep.add_argument('dicom_dir', help='directory containing the dicom files to deploy')
+    parser_dep.add_argument('-o', '--deploy_dir', help='directory to deploy to')
+    parser_dep.add_argument('-d', '--dcmtk_dir', help='directory containing dcmtk binaries')
     parser_dep.set_defaults(func=deploy)
 
     # call the function indicated by the selected subparser

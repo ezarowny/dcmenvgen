@@ -39,30 +39,26 @@ enabled_modalities = ['CR', 'CT', 'DX', 'MG', 'MR',
                       'NM', 'RG', 'US']
 
 # workstations to deploy
-# 'AE Title': {
-#     'attribute': value
-# }
 workstations = {
-    'WK1': {
-        'port': 11112
-    },
-    'WK2': {
-        'port': 11113
-    },
-    'WK2': {
-        'port': 11114
-    }
+    'port': 11112,
+    'ae_titles': ['WK1', 'WK2', 'WK3']
 }
 
 # archives to deploy
 archives = {
-    'AR1': {
-        'port': 4006
-    },
-    'AR2': {
-        'port': 4007
-    },
-    'AR32': {
-        'port': 4008
-    }
+    'port': 4006,
+    'ae_titles': ['AR1', 'AR2', 'AR3']
+}
+
+# remote workstations to deploy to
+# 'AE Title': {
+#     'ip': value
+#     'port': value
+# }
+remote_workstations = {
+
+}
+
+remote_archives = {
+
 }
