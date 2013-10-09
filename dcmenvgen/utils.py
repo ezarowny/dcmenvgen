@@ -2,6 +2,7 @@ import datetime
 import dicom
 import random
 import string
+import time
 
 
 def random_string(size, chars=string.ascii_letters + string.digits):
@@ -11,6 +12,15 @@ def random_string(size, chars=string.ascii_letters + string.digits):
 def random_date_between(start, end):
     return start + datetime.timedelta(
         seconds=random.randint(0, int((end - start).total_seconds())))
+
+
+def generate_uid_with_delay():
+    # This delay is necessary because PyDICOM UIDs include the time but the
+    # smallest resoultion is microseconds, leaving us with non-unique id's
+    # on faster systems.
+    uid = dicom.UID.generate_uid()
+    time.wait(0.001)
+    return uid
 
 
 def create_dicom_file(patient, study, series, image, image_path):
