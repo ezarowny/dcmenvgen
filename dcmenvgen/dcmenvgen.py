@@ -1,9 +1,10 @@
 import argparse
+import copy
 import cPickle
 import deployment
 import hierarchy
 import os
-import shutil
+import random
 import sys
 import utils
 
@@ -11,7 +12,7 @@ import utils
 def generate(args):
     patients = hierarchy.generate_patients(args.num_patients)
     if args.verbose:
-        print_history(patients, True)
+        utils.print_history(patients, True)
     if os.path.isfile(args.output_file):
         overwrite = raw_input('{0} already exists, overwrite? [y/n]: '.format(
             args.output_file))
@@ -24,40 +25,13 @@ def generate(args):
 def view(args):
     with open(args.patients_file, 'rb') as in_file:
         patients = cPickle.load(in_file)
-    print_history(patients, args.verbose)
+    utils.print_history(patients, args.verbose)
 
 
 def populate(args):
     with open(args.patients_file, 'rb') as in_file:
         patients = cPickle.load(in_file)
-
-    if os.path.isfile(args.output_directory):
-        print '{0} already exists'.format(args.output_directory)
-        sys.exit()
-    if os.path.isdir(args.output_directory):
-        overwrite = raw_input('{0} already exists, overwrite? [y/n]: '.format(
-            args.output_directory))
-        if overwrite == 'n':
-            sys.exit()
-        else:
-            shutil.rmtree(args.output_directory)
-    os.makedirs(args.output_directory)
-
-    for patient in patients:
-        patient_dir = os.path.join(args.output_directory, patient.id)
-        os.makedirs(patient_dir)
-        for study in patient.studies:
-            study_dir = os.path.join(patient_dir, study.study_instance_uid)
-            os.makedirs(study_dir)
-            for series in study.series:
-                series_dir = os.path.join(study_dir,
-                                          series.series_instance_uid)
-                os.makedirs(series_dir)
-                for image in series.images:
-                    image_path = os.path.join(series_dir,
-                                              image.sop_instance_uid)
-                    utils.create_dicom_file(patient, study, series, image,
-                                            image_path)
+    utils.create_dicom_files(patients, args.output_directory)
 
 
 def deploy(args):
@@ -68,36 +42,23 @@ def deploy(args):
     deployment.launch(args.deploy_dir)
 
 
-def print_history(patients, verbose):
-    for patient in patients:
-        print '=' * 50
-        print '{0} {1}'.format(patient.first_name, patient.last_name)
-        print 'Sex: {0}'.format(patient.sex)
-        print 'Patient ID: {0}'.format(patient.id)
-        print 'Birth Date: {0}'.format(patient.birth_date.date().isoformat())
-
-        for study in patient.studies:
-            print '\t=== STUDY ==='
-            print '\tStudy UID: {0}'.format(study.study_instance_uid)
-            print '\tStudy Description: {0}'.format(study.study_description)
-            print '\tStudy Date: {0}'.format(study.study_datetime.date())
-            print '\tStudy Time: {0}'.format(study.study_datetime.time())
-            print '\tAccession Number: {0}'.format(study.accession_number)
-
-            if verbose:
-                for series in study.series:
-                    print '\t\t=== SERIES ==='
-                    print '\t\tSeries UID: {0}'.format(series.series_instance_uid)
-                    print '\t\tModality: {0}'.format(series.modality)
-                    print '\t\tSeries Date: {0}'.format(
-                        series.series_datetime.date())
-                    print '\t\tSeries Time: {0}'.format(
-                        series.series_datetime.time())
-
-                    for image in series.images:
-                        print '\t\t\t=== IMAGE ==='
-                        print '\t\t\tImage UID: {0}'.format(image.sop_instance_uid)
-    print '=' * 50
+def order(args):
+    with open(args.patients_file, 'rb') as in_file:
+        patients = cPickle.load(in_file)
+    ordered = []
+    for x in xrange(args.number):
+        patient = random.choice(patients)
+        temp_patient = copy.deepcopy(patient)
+        if patient.studies:
+            last_study_date = patient.studies[-1].study_datetime
+        else:
+            last_study_date = patient.birth_date
+        temp_patient.studies = [hierarchy.Study(last_study_date)]
+        ordered.append(temp_patient)
+    utils.create_dicom_files(ordered, args.output_directory, True)
+    for study_dir in os.listdir(args.output_directory):
+        study_dir_path = os.path.join(args.output_directory, study_dir)
+        utils.send_dicom_files(study_dir_path, args.ae_title, args.ip, args.port)
 
 
 def main():
@@ -142,6 +103,16 @@ def main():
     parser_dep.add_argument('-d', '--dcmtk_dir',
                             help='directory of dcmtk binaries')
     parser_dep.set_defaults(func=deploy)
+
+    # create the parser for the "order" command
+    parser_order = subparsers.add_parser('order', help='order new studies for existing patients')
+    parser_order.add_argument('number', type=int, help='number to add')
+    parser_order.add_argument('patients_file', help='patients file generated by dcmenvgen')
+    parser_order.add_argument('ae_title', help='destination ae title')
+    parser_order.add_argument('ip', help='destination ip address')
+    parser_order.add_argument('port', help='destination port')
+    parser_order.add_argument('-o', '--output_directory', default='ordered', help='directory to place ordered studies')
+    parser_order.set_defaults(func=order)
 
     # call the function indicated by the selected subparser
     args = parser.parse_args()

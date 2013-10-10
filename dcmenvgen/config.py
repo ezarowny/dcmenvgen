@@ -34,13 +34,22 @@ gen_sr = True
 # how often to generate structured reports
 gen_sr_chance = 0.25
 
+# whether or not to generate patient aliases
+gen_alias = True
+
+# how odten to generate patient aliases
+gen_alias_chance = 0.125
+
+# maximum number of times aliases will be used for a patient
+gen_alias_limit = 2
+
 # Modalities for which sample data exists in the image directory
 enabled_modalities = ['CR', 'CT', 'DX', 'MG', 'MR',
                       'NM', 'RG', 'US']
 
 # workstations to deploy
 workstations = {
-    'port': 11112,
+    'port': 11113,
     'ae_titles': ['WK1', 'WK2', 'WK3']
 }
 
@@ -48,17 +57,4 @@ workstations = {
 archives = {
     'port': 4006,
     'ae_titles': ['AR1', 'AR2', 'AR3']
-}
-
-# remote workstations to deploy to
-# 'AE Title': {
-#     'ip': value
-#     'port': value
-# }
-remote_workstations = {
-
-}
-
-remote_archives = {
-
 }

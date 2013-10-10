@@ -15,7 +15,7 @@ class Image:
     """
 
     def __init__(self):
-        self.sop_instance_uid = utils.generate_uid_with_delay
+        self.sop_instance_uid = utils.generate_uid_with_delay()
 
 
 class Series:
@@ -37,7 +37,7 @@ class Series:
         self.modality = modality
         self.series_datetime = datetime.datetime.combine(
             from_date, datetime.datetime.now().time())
-        self.series_instance_uid = utils.generate_uid_with_delay
+        self.series_instance_uid = utils.generate_uid_with_delay()
         num_images = random.randint(config.min_images, config.max_images)
         self.images = self.generate_images(num_images)
 
@@ -70,10 +70,10 @@ class Study:
         accession_length = random.randint(
             config.min_accn_length, config.max_accn_length)
         self.accession_number = utils.random_string(accession_length)
-        modality = config.sample_data.random_modality()
+        modality = config.sample_data.random_modality(config.enabled_modalities)
         self.study_description = config.sample_data.random_study_description(
             modality)
-        self.study_instance_uid = utils.generate_uid_with_delay
+        self.study_instance_uid = utils.generate_uid_with_delay()
         num_series = random.randint(config.min_series, config.max_series)
         self.series = self.generate_series(
             num_series, self.study_datetime.date(), modality)

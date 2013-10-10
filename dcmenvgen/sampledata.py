@@ -1,4 +1,3 @@
-import config
 import csv
 import random
 
@@ -28,8 +27,8 @@ class SampleData:
                     self.study_descriptions[modality] = []
                 self.study_descriptions[modality].append(study_description)
 
-    def random_modality(self):
-        modality = random.choice(config.enabled_modalities)
+    def random_modality(self, modalities):
+        modality = random.choice(modalities)
         return modality
 
     def random_study_description(self, modality):
