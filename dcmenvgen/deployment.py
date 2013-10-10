@@ -24,11 +24,11 @@ def setup_directories(deploy_dir):
 def create_ae_config(deploy_dir):
     config_file = os.path.join(deploy_dir, 'dcmqrscp.cfg')
     with open(config_file, 'w') as f:
-        f.write('{}{}\n'.format('#', '='*71))
+        f.write('{}{}\n'.format('#', '=' * 71))
         f.write('#\n')
         f.write('# dcmenvgen generated configuration file for dcmqrdb\n')
         f.write('#\n')
-        f.write('{}{}\n'.format('#', '='*71))
+        f.write('{}{}\n'.format('#', '=' * 71))
         f.write('\n')
         f.write('NetworkTCPPort  = {}\n'.format(config.archives['port']))
         f.write('MaxPDUSize      = 16384\n')

@@ -1,4 +1,3 @@
-import config
 import datetime
 import dicom
 import os
@@ -29,7 +28,8 @@ def generate_uid_with_delay():
 
 
 def send_dicom_files(files_to_send, ae_title, ip, port):
-    subprocess.call(['storescu', ip, port, '-aec', ae_title, '+sd', '+r', files_to_send])
+    subprocess.call(['storescu', ip, port, '-aec', ae_title, '+sd', '+r',
+                     files_to_send])
 
 
 def create_dicom_files(patients, output_directory, skip_patient=False):
@@ -37,7 +37,8 @@ def create_dicom_files(patients, output_directory, skip_patient=False):
         print '{0} already exists'.format(output_directory)
         sys.exit()
     if os.path.isdir(output_directory):
-        overwrite = raw_input('{0} already exists, overwrite? [y/n]: '.format(output_directory))
+        overwrite = raw_input('{0} already exists, overwrite? [y/n]: '.format(
+            output_directory))
         if overwrite == 'n':
             sys.exit()
         else:
@@ -60,7 +61,8 @@ def create_dicom_files(patients, output_directory, skip_patient=False):
                 for image in series.images:
                     image_path = os.path.join(series_dir,
                                               image.sop_instance_uid)
-                    create_dicom_file(patient, study, series, image, image_path)
+                    create_dicom_file(patient, study, series, image,
+                                      image_path)
 
 
 def create_dicom_file(patient, study, series, image, image_path):
@@ -115,7 +117,8 @@ def print_history(patients, verbose=False):
             if verbose:
                 for series in study.series:
                     print '\t\t=== SERIES ==='
-                    print '\t\tSeries UID: {0}'.format(series.series_instance_uid)
+                    print '\t\tSeries UID: {0}'.format(
+                        series.series_instance_uid)
                     print '\t\tModality: {0}'.format(series.modality)
                     print '\t\tSeries Date: {0}'.format(
                         series.series_datetime.date())
@@ -124,5 +127,6 @@ def print_history(patients, verbose=False):
 
                     for image in series.images:
                         print '\t\t\t=== IMAGE ==='
-                        print '\t\t\tImage UID: {0}'.format(image.sop_instance_uid)
+                        print '\t\t\tImage UID: {0}'.format(
+                            image.sop_instance_uid)
     print '=' * 50

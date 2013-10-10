@@ -70,7 +70,8 @@ class Study:
         accession_length = random.randint(
             config.min_accn_length, config.max_accn_length)
         self.accession_number = utils.random_string(accession_length)
-        modality = config.sample_data.random_modality(config.enabled_modalities)
+        modality = config.sample_data.random_modality(
+            config.enabled_modalities)
         self.study_description = config.sample_data.random_study_description(
             modality)
         self.study_instance_uid = utils.generate_uid_with_delay()

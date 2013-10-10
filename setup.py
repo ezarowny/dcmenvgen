@@ -10,6 +10,7 @@ config = {
     'author_email': 'ezarowny@gmail.com',
     'url': 'https://github.com/ezarowny/dcmenvgen',
     'packages': ['dcmenvgen'],
+    'package_data': {'dcmenvgen': ['sampledata/descriptions.csv']},
     'scripts': ['scripts/dcmenvgen'],
 }
 
