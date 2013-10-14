@@ -66,7 +66,8 @@ def create_dicom_files(patients, output_directory, skip_patient=False):
 
 
 def create_dicom_file(patient, study, series, image, image_path):
-    original = dicom.read_file('images/{0}.dcm'.format(series.modality))
+    path = os.path.join(os.path.dirname(__file__), 'images', '{}.dcm'.format(series.modality))
+    original = dicom.read_file(path)
     ds = original
 
     # change meta header
@@ -92,6 +93,10 @@ def create_dicom_file(patient, study, series, image, image_path):
     ds.SeriesTime = series.series_datetime.time().strftime('%H%M%S')
 
     # add image information
+    ds.AcquisitionDate = image.instance_datetime.date().strftime('%Y%m%d')
+    ds.AcquisitionTime = image.instance_datetime.time().strftime('%H%M%S')
+    ds.ContentDate = image.instance_datetime.date().strftime('%Y%m%d')
+    ds.ContentTime = image.instance_datetime.time().strftime('%H%M%S')
     ds.SOPInstanceUID = image.sop_instance_uid
 
     # save file with dicom extension
@@ -129,4 +134,8 @@ def print_history(patients, verbose=False):
                         print '\t\t\t=== IMAGE ==='
                         print '\t\t\tImage UID: {0}'.format(
                             image.sop_instance_uid)
+                        print '\t\tImage Date: {0}'.format(
+                            image.instance_datetime.date())
+                        print '\t\tImage Time: {0}'.format(
+                            image.instance_datetime.time())
     print '=' * 50

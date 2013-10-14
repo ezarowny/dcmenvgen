@@ -10,11 +10,14 @@ class Image:
     """Represents a DICOM image.
 
     Instance Variables:
+    instance_datetime   -- date and time the image was captured
     sop_class_uid       -- sop class uid of the image
 
     """
 
-    def __init__(self):
+    def __init__(self, from_date):
+        self.instance_datetime = datetime.datetime.combine(
+            from_date, datetime.datetime.now().time())
         self.sop_instance_uid = utils.generate_uid_with_delay()
 
 
@@ -33,18 +36,17 @@ class Series:
 
     """
 
-    def __init__(self, from_date, modality):
+    def __init__(self, from_datetime, modality):
         self.modality = modality
-        self.series_datetime = datetime.datetime.combine(
-            from_date, datetime.datetime.now().time())
+        self.series_datetime = from_datetime
         self.series_instance_uid = utils.generate_uid_with_delay()
         num_images = random.randint(config.min_images, config.max_images)
-        self.images = self.generate_images(num_images)
+        self.images = self.generate_images(num_images, self.series_datetime)
 
-    def generate_images(self, num_images):
+    def generate_images(self, num_images, series_datetime):
         images = []
         for i in xrange(num_images):
-            images.append(Image())
+            images.append(Image(series_datetime))
         return images
 
 
@@ -64,9 +66,9 @@ class Study:
 
     """
 
-    def __init__(self, from_date):
+    def __init__(self, from_datetime):
         self.study_datetime = utils.random_date_between(
-            from_date, datetime.datetime.now())
+            from_datetime, datetime.datetime.now())
         accession_length = random.randint(
             config.min_accn_length, config.max_accn_length)
         self.accession_number = utils.random_string(accession_length)
@@ -77,15 +79,16 @@ class Study:
         self.study_instance_uid = utils.generate_uid_with_delay()
         num_series = random.randint(config.min_series, config.max_series)
         self.series = self.generate_series(
-            num_series, self.study_datetime.date(), modality)
+            num_series, self.study_datetime, modality)
 
-    def generate_series(self, num_series, study_date, modality):
+    def generate_series(self, num_series, study_datetime, modality):
         series = []
+        # TODO: increment the time here logically
         for i in xrange(num_series):
-            series.append(Series(study_date, modality))
+            series.append(Series(study_datetime, modality))
         if config.gen_sr:
             if random.random() < config.gen_sr_chance:
-                series.append(Series(study_date, 'SR'))
+                series.append(Series(study_datetime, 'SR'))
         return series
 
 

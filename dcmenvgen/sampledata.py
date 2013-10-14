@@ -1,7 +1,6 @@
 import csv
 import random
 import os
-import sys
 
 
 class SampleData:
@@ -19,10 +18,9 @@ class SampleData:
     """
 
     def __init__(self):
-        print 'file: ' + os.path.dirname(__file__)
-        print 'sys: ' + sys.prefix
+        path = os.path.dirname(__file__)
         self.study_descriptions = {}
-        with open('sampledata/descriptions.csv') as data:
+        with open(os.path.join(path, 'sampledata/descriptions.csv')) as data:
             reader = csv.reader(data)
             for row in reader:
                 modality = row[0]
