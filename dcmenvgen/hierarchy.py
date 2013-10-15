@@ -1,7 +1,9 @@
+import calendar
 import config
 import datetime
 import names
 import random
+import string
 import utils
 
 
@@ -126,10 +128,54 @@ class Patient:
         end = datetime.datetime.now()
         self.birth_date = utils.random_date_between(start, end)
 
+        self.aliases = []
+        if config.gen_alias:
+            for i in xrange(config.gen_alias_limit):
+                if random.random() < config.gen_alias_chance:
+                    self.aliases.append(self.generate_alias())
+
         self.studies = self.generate_studies(self.birth_date)
 
     def generate_alias(self):
-        pass
+        change = random.choice(config.enabled_alias_changes)
+        if change == 'patient_id':
+            id_length = random.randint(config.min_id_length,
+                                       config.max_id_length)
+            alias = (change, utils.random_string(id_length))
+        elif change == 'first_initial':
+            alias = (change, self.first_name[0])
+        elif change == 'middle_initial':
+            alias = (change, utils.random_string(1, string.ascii_uppercase))
+        elif change == 'last_name':
+            alias = (change, names.get_last_name())
+        elif change == 'gender':
+            gender = random.randint(0, 1)
+            if gender == 0:
+                alias = (change, 'O')
+            else:
+                alias = (change, '')
+        elif change == 'date_of_birth':
+            part = random.choice(['day', 'month', 'year'])
+            num_days = calendar.monthrange(self.birth_date.year,
+                                           self.birth_date.month)
+            if (self.birth_date.day == 1 or self.birth_date.month == 1 or
+                    self.birth_date == 1900):
+                amount = 1
+            elif (self.birth_date.day == num_days[1] or
+                  self.birth_date.month == 12):
+                amount = -1
+            else:
+                amount = random.choice([-1, 1])
+            if part == 'day':
+                delta = self.birth_date.day + amount
+                alias = (change, self.birth_date.replace(day=delta))
+            if part == 'month':
+                delta = self.birth_date.month + amount
+                alias = (change, self.birth_date.replace(month=delta))
+            else:
+                delta = self.birth_date.year + amount
+                alias = (change, self.birth_date.replace(year=delta))
+        return alias
 
     def generate_studies(self, start_datetime):
         studies = []

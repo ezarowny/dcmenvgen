@@ -66,7 +66,8 @@ def create_dicom_files(patients, output_directory, skip_patient=False):
 
 
 def create_dicom_file(patient, study, series, image, image_path):
-    path = os.path.join(os.path.dirname(__file__), 'images', '{}.dcm'.format(series.modality))
+    path = os.path.join(os.path.dirname(__file__), 'images',
+                        '{}.dcm'.format(series.modality))
     original = dicom.read_file(path)
     ds = original
 
@@ -110,6 +111,7 @@ def print_history(patients, verbose=False):
         print 'Sex: {0}'.format(patient.sex)
         print 'Patient ID: {0}'.format(patient.id)
         print 'Birth Date: {0}'.format(patient.birth_date.date().isoformat())
+        print 'Aliases: {0}'.format(patient.aliases)
 
         for study in patient.studies:
             print '\t=== STUDY ==='
