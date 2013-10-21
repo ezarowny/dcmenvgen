@@ -1,3 +1,4 @@
+import config
 import datetime
 import dicom
 import os
@@ -32,7 +33,7 @@ def send_dicom_files(files_to_send, ae_title, ip, port):
                      files_to_send])
 
 
-def create_dicom_files(patients, output_directory, skip_patient=False):
+def create_dicom_files(patients, output_directory, skip_patient_dir=False):
     if os.path.isfile(output_directory):
         print '{0} already exists'.format(output_directory)
         sys.exit()
@@ -46,12 +47,17 @@ def create_dicom_files(patients, output_directory, skip_patient=False):
     os.makedirs(output_directory)
 
     for patient in patients:
-        if skip_patient:
+        if skip_patient_dir:
             patient_dir = output_directory
         else:
             patient_dir = os.path.join(output_directory, patient.id)
             os.makedirs(patient_dir)
-        for study in patient.studies:
+        for count, study in enumerate(patient.studies):
+            temp = ('', '')
+            if ((count + 1) % config.gen_alias_req) == 0 and patient.aliases:
+                alias = patient.aliases.pop()
+                temp = (alias[0], getattr(patient, alias[0]))
+                setattr(patient, alias[0], alias[1])
             study_dir = os.path.join(patient_dir, study.study_instance_uid)
             os.makedirs(study_dir)
             for series in study.series:
@@ -63,6 +69,8 @@ def create_dicom_files(patients, output_directory, skip_patient=False):
                                               image.sop_instance_uid)
                     create_dicom_file(patient, study, series, image,
                                       image_path)
+            if temp != ('', ''):
+                setattr(patient, temp[0], temp[1])
 
 
 def create_dicom_file(patient, study, series, image, image_path):

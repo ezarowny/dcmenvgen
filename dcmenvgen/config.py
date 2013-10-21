@@ -41,11 +41,14 @@ gen_alias = True
 gen_alias_chance = 0.125
 
 # maximum number of times aliases will be generated for a patient
-gen_alias_limit = 2
+gen_alias_max = 2
+
+# number of studies required before applying an alias
+gen_alias_req = 4
 
 # changes for alias generation
 enabled_alias_changes = ['patient_id', 'first_initial', 'middle_initial',
-                         'gender', 'date_of_birth']
+                         'gender', 'birth_date']
 
 # Mmdalities for which sample data exists in the image directory
 enabled_modalities = ['CR', 'CT', 'DX', 'MG', 'MR',

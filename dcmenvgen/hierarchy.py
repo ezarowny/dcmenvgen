@@ -130,7 +130,7 @@ class Patient:
 
         self.aliases = []
         if config.gen_alias:
-            for i in xrange(config.gen_alias_limit):
+            for i in xrange(config.gen_alias_max):
                 if random.random() < config.gen_alias_chance:
                     self.aliases.append(self.generate_alias())
 
@@ -141,20 +141,20 @@ class Patient:
         if change == 'patient_id':
             id_length = random.randint(config.min_id_length,
                                        config.max_id_length)
-            alias = (change, utils.random_string(id_length))
+            alias = ('id', utils.random_string(id_length))
         elif change == 'first_initial':
-            alias = (change, self.first_name[0])
+            alias = ('first_name', self.first_name[0])
         elif change == 'middle_initial':
             alias = (change, utils.random_string(1, string.ascii_uppercase))
         elif change == 'last_name':
-            alias = (change, names.get_last_name())
+            alias = ('last_name', names.get_last_name())
         elif change == 'gender':
             gender = random.randint(0, 1)
             if gender == 0:
-                alias = (change, 'O')
+                alias = ('sex', 'O')
             else:
-                alias = (change, '')
-        elif change == 'date_of_birth':
+                alias = ('sex', '')
+        elif change == 'birth_date':
             part = random.choice(['day', 'month', 'year'])
             num_days = calendar.monthrange(self.birth_date.year,
                                            self.birth_date.month)
@@ -168,13 +168,13 @@ class Patient:
                 amount = random.choice([-1, 1])
             if part == 'day':
                 delta = self.birth_date.day + amount
-                alias = (change, self.birth_date.replace(day=delta))
+                alias = ('birth_date', self.birth_date.replace(day=delta))
             if part == 'month':
                 delta = self.birth_date.month + amount
-                alias = (change, self.birth_date.replace(month=delta))
+                alias = ('birth_date', self.birth_date.replace(month=delta))
             else:
                 delta = self.birth_date.year + amount
-                alias = (change, self.birth_date.replace(year=delta))
+                alias = ('birth_date', self.birth_date.replace(year=delta))
         return alias
 
     def generate_studies(self, start_datetime):
