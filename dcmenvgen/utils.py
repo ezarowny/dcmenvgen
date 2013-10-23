@@ -35,10 +35,10 @@ def send_dicom_files(files_to_send, ae_title, ip, port):
 
 def create_dicom_files(patients, output_directory, skip_patient_dir=False):
     if os.path.isfile(output_directory):
-        print '{0} already exists'.format(output_directory)
+        print '{} already exists'.format(output_directory)
         sys.exit()
     if os.path.isdir(output_directory):
-        overwrite = raw_input('{0} already exists, overwrite? [y/n]: '.format(
+        overwrite = raw_input('{} already exists, overwrite? [y/n]: '.format(
             output_directory))
         if overwrite == 'n':
             sys.exit()
@@ -86,7 +86,9 @@ def create_dicom_file(patient, study, series, image, image_path):
     # add patient information
     ds.PatientID = patient.id
     ds.PatientSex = patient.sex
-    ds.PatientName = '{0}^{1}'.format(patient.last_name, patient.first_name)
+    ds.PatientName = '{}^{}'.format(patient.last_name, patient.first_name)
+    if patient.middle_name:
+        ds.PatientName += '^{}'.format(patient.middle_name)
     ds.PatientBirthDate = patient.birth_date.date().strftime('%Y%m%d')
 
     # add study information
@@ -115,37 +117,41 @@ def create_dicom_file(patient, study, series, image, image_path):
 def print_history(patients, verbose=False):
     for patient in patients:
         print '=' * 50
-        print '{0} {1}'.format(patient.first_name, patient.last_name)
-        print 'Sex: {0}'.format(patient.sex)
-        print 'Patient ID: {0}'.format(patient.id)
-        print 'Birth Date: {0}'.format(patient.birth_date.date().isoformat())
-        print 'Aliases: {0}'.format(patient.aliases)
+        if patient.middle_name:
+            print '{} {} {}'.format(patient.first_name, patient.middle_name,
+                                    patient.last_name)
+        else:
+            print '{} {}'.format(patient.first_name, patient.last_name)
+        print 'Sex: {}'.format(patient.sex)
+        print 'Patient ID: {}'.format(patient.id)
+        print 'Birth Date: {}'.format(patient.birth_date.date().isoformat())
+        print 'Aliases: {}'.format(patient.aliases)
 
         for study in patient.studies:
             print '\t=== STUDY ==='
-            print '\tStudy UID: {0}'.format(study.study_instance_uid)
-            print '\tStudy Description: {0}'.format(study.study_description)
-            print '\tStudy Date: {0}'.format(study.study_datetime.date())
-            print '\tStudy Time: {0}'.format(study.study_datetime.time())
-            print '\tAccession Number: {0}'.format(study.accession_number)
+            print '\tStudy UID: {}'.format(study.study_instance_uid)
+            print '\tStudy Description: {}'.format(study.study_description)
+            print '\tStudy Date: {}'.format(study.study_datetime.date())
+            print '\tStudy Time: {}'.format(study.study_datetime.time())
+            print '\tAccession Number: {}'.format(study.accession_number)
 
             if verbose:
                 for series in study.series:
                     print '\t\t=== SERIES ==='
-                    print '\t\tSeries UID: {0}'.format(
+                    print '\t\tSeries UID: {}'.format(
                         series.series_instance_uid)
-                    print '\t\tModality: {0}'.format(series.modality)
-                    print '\t\tSeries Date: {0}'.format(
+                    print '\t\tModality: {}'.format(series.modality)
+                    print '\t\tSeries Date: {}'.format(
                         series.series_datetime.date())
-                    print '\t\tSeries Time: {0}'.format(
+                    print '\t\tSeries Time: {}'.format(
                         series.series_datetime.time())
 
                     for image in series.images:
                         print '\t\t\t=== IMAGE ==='
-                        print '\t\t\tImage UID: {0}'.format(
+                        print '\t\t\tImage UID: {}'.format(
                             image.sop_instance_uid)
-                        print '\t\tImage Date: {0}'.format(
+                        print '\t\tImage Date: {}'.format(
                             image.instance_datetime.date())
-                        print '\t\tImage Time: {0}'.format(
+                        print '\t\tImage Time: {}'.format(
                             image.instance_datetime.time())
     print '=' * 50

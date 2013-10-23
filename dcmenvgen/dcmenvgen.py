@@ -10,14 +10,14 @@ import utils
 
 
 def generate(args):
-    patients = hierarchy.generate_patients(args.num_patients)
-    if args.verbose:
-        utils.print_history(patients, True)
     if os.path.isfile(args.output_file):
-        overwrite = raw_input('{0} already exists, overwrite? [y/n]: '.format(
+        overwrite = raw_input('{} already exists, overwrite? [y/n]: '.format(
             args.output_file))
         if overwrite == 'n':
             sys.exit()
+    patients = hierarchy.generate_patients(args.num_patients)
+    if args.verbose:
+        utils.print_history(patients, True)
     with open(args.output_file, 'wb') as out_file:
         cPickle.dump(patients, out_file, 2)
 

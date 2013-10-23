@@ -102,6 +102,7 @@ class Patient:
     id          -- the patient's id
     sex         -- the patient's sex
     first_name  -- the patient's first name
+    middle_name -- the patient's middle name
     last_name   -- the patient's last name
     birth_date  -- the patient's birth date
     aliases     -- the patient's information permutations
@@ -116,13 +117,22 @@ class Patient:
     def __init__(self):
         id_length = random.randint(config.min_id_length, config.max_id_length)
         self.id = utils.random_string(id_length)
-        self.sex = random.choice('MF')
 
-        if self.sex == 'M':
-            self.first_name = names.get_first_name('male')
+        sex = random.choice(['male', 'female'])
+        if sex == 'male':
+            self.sex = 'M'
         else:
-            self.first_name = names.get_first_name('female')
+            self.sex = 'F'
+
+        self.first_name = names.get_first_name(sex)
         self.last_name = names.get_last_name()
+        self.middle_name = ''
+        if config.gen_mid_name:
+            if random.random() < config.gen_mid_name_chance:
+                if random.randint(0, 1):
+                    self.middle_name = names.get_first_name(sex)
+                else:
+                    self.middle_name = names.get_first_name(sex)[0]
 
         start = datetime.datetime(1900, 1, 1)
         end = datetime.datetime.now()
@@ -142,18 +152,26 @@ class Patient:
             id_length = random.randint(config.min_id_length,
                                        config.max_id_length)
             alias = ('id', utils.random_string(id_length))
-        elif change == 'first_initial':
-            alias = ('first_name', self.first_name[0])
-        elif change == 'middle_initial':
-            alias = (change, utils.random_string(1, string.ascii_uppercase))
+        elif change == 'first_name':
+            alias = (change, self.first_name[0])
+        elif change == 'middle_name':
+            if len(self.middle_name) > 1:
+                if random.randint(0, 1):
+                    alias = (change, self.middle_name[0])
+                else:
+                    alias = (change, '')
+            elif len(self.middle_name) == 1:
+                alias = (change, '')
+            elif len(self.middle_name) == 0:
+                alias = (change,
+                         utils.random_string(1, string.ascii_uppercase))
         elif change == 'last_name':
-            alias = ('last_name', names.get_last_name())
-        elif change == 'gender':
-            gender = random.randint(0, 1)
-            if gender == 0:
-                alias = ('sex', 'O')
+            alias = (change, names.get_last_name())
+        elif change == 'sex':
+            if random.randint(0, 1):
+                alias = (change, 'O')
             else:
-                alias = ('sex', '')
+                alias = (change, '')
         elif change == 'birth_date':
             part = random.choice(['day', 'month', 'year'])
             num_days = calendar.monthrange(self.birth_date.year,
@@ -168,13 +186,13 @@ class Patient:
                 amount = random.choice([-1, 1])
             if part == 'day':
                 delta = self.birth_date.day + amount
-                alias = ('birth_date', self.birth_date.replace(day=delta))
+                alias = (change, self.birth_date.replace(day=delta))
             if part == 'month':
                 delta = self.birth_date.month + amount
-                alias = ('birth_date', self.birth_date.replace(month=delta))
+                alias = (change, self.birth_date.replace(month=delta))
             else:
                 delta = self.birth_date.year + amount
-                alias = ('birth_date', self.birth_date.replace(year=delta))
+                alias = (change, self.birth_date.replace(year=delta))
         return alias
 
     def generate_studies(self, start_datetime):
