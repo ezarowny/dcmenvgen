@@ -197,13 +197,11 @@ class Patient:
 
     def generate_studies(self, start_datetime):
         studies = []
-        last_datetime = start_datetime
         num_studies = random.randint(config.min_studies, config.max_studies)
         for i in xrange(num_studies):
-            study = Study(last_datetime)
+            study = Study(self.birth_date)
             studies.append(study)
-            last_datetime = study.study_datetime
-        return studies
+        return sorted(studies, key=lambda x: x.study_datetime)
 
 
 def generate_patients(num_patients):
