@@ -74,7 +74,7 @@ def split(args):
                 for study_dir in os.listdir(patient_dir_path):
                     src = os.path.join(patient_dir_path, study_dir)
                     dst = os.path.join(args.output_directory,
-                                        random.choice(directories))
+                                       random.choice(directories))
                     shutil.move(src, dst)
     else:
         print '{} is not a directory!'.format(args.input_directory)
