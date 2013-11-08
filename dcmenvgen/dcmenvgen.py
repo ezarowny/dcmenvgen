@@ -5,6 +5,7 @@ import deployment
 import hierarchy
 import os
 import random
+import shutil
 import sys
 import utils
 
@@ -62,6 +63,23 @@ def order(args):
                                args.port)
 
 
+def split(args):
+    directories = [str(x) for x in xrange(args.number)]
+    for directory in directories:
+        os.makedirs(os.path.join(args.output_directory, directory))
+    if os.path.isdir(args.input_directory):
+        for patient_dir in os.listdir(args.input_directory):
+            patient_dir_path = os.path.join(args.input_directory, patient_dir)
+            if os.path.isdir(patient_dir_path):
+                for study_dir in os.listdir(patient_dir_path):
+                    src = os.path.join(patient_dir_path, study_dir)
+                    dst = os.path.join(args.output_directory,
+                                        random.choice(directories))
+                    shutil.move(src, dst)
+    else:
+        print '{} is not a directory!'.format(args.input_directory)
+
+
 def main():
     parser = argparse.ArgumentParser(description='DICOM environment generator',
                                      prog='dcmenvgen')
@@ -117,6 +135,14 @@ def main():
     parser_order.add_argument('-o', '--output_directory', default='ordered',
                               help='directory to place ordered studies')
     parser_order.set_defaults(func=order)
+
+    parser_split = subparsers.add_parser(
+        'split', help='split the output of populate into separate directories')
+    parser_split.add_argument('input_directory', help='directory to split')
+    parser_split.add_argument('output_directory',
+                              help='directory to output to')
+    parser_split.add_argument('number', type=int, help='number of directories')
+    parser_split.set_defaults(func=split)
 
     # call the function indicated by the selected subparser
     args = parser.parse_args()
